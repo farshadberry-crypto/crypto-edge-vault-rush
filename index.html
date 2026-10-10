@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,6 +56,7 @@ p{color:var(--muted);line-height:1.55}
 .notice{margin-top:12px;background:#21172c;border:1px solid var(--line);padding:13px;border-radius:11px;font-size:13px;line-height:1.5}
 .nav{display:flex;gap:8px;margin-top:24px}.nav button{flex:1}
 footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
+.telegram-player{display:block;margin-top:12px;background:#17121f;color:#fff;padding:10px 12px;border:1px solid #9b59b6;border-radius:12px;font-size:12px;font-weight:700;overflow-wrap:anywhere}
 @media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:1fr}.vault-art{min-height:180px}.vault-icon{font-size:65px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.portrait{height:140px;font-size:52px}.choices{grid-template-columns:1fr}.choice{min-height:65px}.stats{gap:5px}.stat{padding:8px}.stat b{font-size:17px}}
 </style>
 </head>
@@ -66,6 +66,8 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  <div><div class="logo">VAULT <span>RUSH</span></div><div class="eyebrow">A Crypto Edge game</div></div>
  <div class="wallet">◈ <span id="loot">0</span> LOOT</div>
 </header>
+
+<div id="vr-telegram-player" class="telegram-player">🎮 PLAYER: Loading...</div>
 
 <main id="home">
  <section class="hero">
@@ -82,7 +84,6 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
   </div>
   <div class="vault-art"><div class="vault-icon">🔐</div><h2>MIDNIGHT VAULT</h2><p>Three rooms. One big score.</p><span class="tag">MISSION 01 · AVAILABLE</span></div>
  </section>
-
  <div class="section-title"><h2>Choose Your Operator</h2><span class="tag">CREW SELECT</span></div>
  <section class="cards" id="characters"></section>
 
@@ -98,7 +99,6 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  <div class="choices" id="choices"></div>
  <div class="notice" id="notice">Choose your first move.</div>
 </section>
-
 <div class="nav">
  <button class="secondary" onclick="goHome()">⌂ HOME</button>
  <button class="secondary" onclick="showInventory()">▣ INVENTORY</button>
@@ -279,6 +279,29 @@ function showStats(){
  alert("VAULT RUSH STATS\n\nCompleted heists: "+state.missions+"\nBest score: "+state.best+"\nDemo loot: "+state.loot+"\nUnlocked items: "+state.inventory.length+"\nSelected operator: "+character().name);
 }
 renderCharacters();renderShop();updateUI();
+</script>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+(function(){
+ const badge=document.getElementById("vr-telegram-player");
+ const tg=window.Telegram&&window.Telegram.WebApp;
+
+ if(tg){
+  tg.ready();
+  tg.expand();
+  const user=tg.initDataUnsafe&&tg.initDataUnsafe.user;
+
+  if(user){
+   const name=user.first_name||user.username||"Player";
+   badge.textContent="🎮 PLAYER: "+name;
+  }else{
+   badge.textContent="🎮 PLAYER: Guest";
+  }
+ }else{
+  badge.textContent="🎮 PLAYER: Guest";
+ }
+})();
 </script>
 </body>
 </html>
