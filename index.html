@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,7 +57,9 @@ p{color:var(--muted);line-height:1.55}
 .notice{margin-top:12px;background:#21172c;border:1px solid var(--line);padding:13px;border-radius:11px;font-size:13px;line-height:1.5}
 .nav{display:flex;gap:8px;margin-top:24px}.nav button{flex:1}
 footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
-.telegram-player{display:block;margin-top:12px;background:#17121f;color:#fff;padding:10px 12px;border:1px solid #9b59b6;border-radius:12px;font-size:12px;font-weight:700;overflow-wrap:anywhere}
+.telegram-player{display:block;margin-top:12px;background:#17121f;color:#fff;padding:12px;border:1px solid #9b59b6;border-radius:12px;font-size:12px;font-weight:700;overflow-wrap:anywhere;word-break:break-word;line-height:1.8;width:100%;max-width:100%;white-space:normal}
+.telegram-player .player-label{color:#ff9bd3}
+.telegram-player .player-value{color:#ffd16a}
 @media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:1fr}.vault-art{min-height:180px}.vault-icon{font-size:65px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.portrait{height:140px;font-size:52px}.choices{grid-template-columns:1fr}.choice{min-height:65px}.stats{gap:5px}.stat{padding:8px}.stat b{font-size:17px}}
 </style>
 </head>
@@ -67,7 +70,11 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  <div class="wallet">◈ <span id="loot">0</span> LOOT</div>
 </header>
 
-<div id="vr-telegram-player" class="telegram-player" style="position:relative;top:auto;right:auto;width:100%;max-width:none;white-space:normal;overflow-wrap:anywhere;">🎮 PLAYER: Loading...</div>
+<div id="vr-telegram-player" class="telegram-player">
+ <div>🎮 TELEGRAM PLAYER</div>
+ <div><span class="player-label">Telegram ID: </span><span class="player-value">Loading...</span></div>
+ <div><span class="player-label">Username: </span><span class="player-value">Loading...</span></div>
+</div>
 
 <main id="home">
  <section class="hero">
@@ -86,7 +93,6 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  </section>
  <div class="section-title"><h2>Choose Your Operator</h2><span class="tag">CREW SELECT</span></div>
  <section class="cards" id="characters"></section>
-
  <div class="section-title"><h2>Rogue's Market</h2><span class="tag">DEMO SHOP</span></div>
  <section class="cards" id="shop"></section>
  <p class="small">Prototype only. Loot has no cash value. Shop purchases use demo loot, not real money.</p>
@@ -99,6 +105,7 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  <div class="choices" id="choices"></div>
  <div class="notice" id="notice">Choose your first move.</div>
 </section>
+
 <div class="nav">
  <button class="secondary" onclick="goHome()">⌂ HOME</button>
  <button class="secondary" onclick="showInventory()">▣ INVENTORY</button>
@@ -110,9 +117,13 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
 <script>
 const defaultState={loot:0,step:0,score:0,missions:0,best:0,inventory:[],crew:"nyx"};
 let state;
+
 try{
  state=Object.assign({...defaultState},JSON.parse(localStorage.getItem("vr_save")||"{}"));
-}catch(e){state={...defaultState};}
+}catch(e){
+ state={...defaultState};
+}
+
 if(!Array.isArray(state.inventory))state.inventory=[];
 if(!["nyx","viper","ace"].includes(state.crew))state.crew="nyx";
 
@@ -151,83 +162,120 @@ function save(){
  try{localStorage.setItem("vr_save",JSON.stringify(state));}catch(e){}
  updateUI();
 }
+
 function owned(id){return state.inventory.includes(id);}
 function character(){return characters.find(c=>c.id===state.crew)||characters[0];}
+
 function updateUI(){
  document.getElementById("loot").textContent=state.loot;
  document.getElementById("missionCount").textContent=state.missions;
  document.getElementById("best").textContent=state.best;
  document.getElementById("crewCount").textContent=characters.filter(c=>c.price===0||owned("crew_"+c.id)).length+"/3";
 }
+
 function renderCharacters(){
- const box=document.getElementById("characters");box.innerHTML="";
+ const box=document.getElementById("characters");
+ box.innerHTML="";
  characters.forEach(c=>{
   const unlocked=c.price===0||owned("crew_"+c.id);
   const selected=state.crew===c.id;
-  const card=document.createElement("div");card.className="card"+(selected?" selected":"");
+  const card=document.createElement("div");
+  card.className="card"+(selected?" selected":"");
   card.innerHTML=`<div class="portrait"></div><span class="badge">${c.role}</span><h3>${c.name}</h3><p>${c.desc}</p><p><b>Perk:</b> ${c.perk}</p><div class="small">${c.style}</div>`;
   const portrait=card.querySelector(".portrait");
   const img=document.createElement("img");
   img.src=c.image;
   img.alt=c.name;
-  img.onerror=()=>{portrait.textContent=c.emoji;};
+  img.onerror=()=>{
+   img.remove();
+   portrait.textContent=c.emoji;
+  };
   portrait.appendChild(img);
-  const btn=document.createElement("button");btn.className=selected?"primary":"secondary";
+  const btn=document.createElement("button");
+  btn.className=selected?"primary":"secondary";
   btn.textContent=selected?"SELECTED":unlocked?"SELECT":"UNLOCK · "+c.price+" LOOT";
   btn.onclick=()=>selectCharacter(c.id);
-  card.appendChild(btn);box.appendChild(card);
+  card.appendChild(btn);
+  box.appendChild(card);
  });
 }
+
 function selectCharacter(id){
- const c=characters.find(x=>x.id===id);if(!c)return;
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
  if(c.price>0&&!owned("crew_"+id)){
   if(state.loot<c.price){alert("Not enough demo loot. Complete another heist first.");return;}
   if(!confirm("Unlock "+c.name+" for "+c.price+" demo loot?"))return;
-  state.loot-=c.price;state.inventory.push("crew_"+id);
+  state.loot-=c.price;
+  state.inventory.push("crew_"+id);
  }
- state.crew=id;save();renderCharacters();
+ state.crew=id;
+ save();
+ renderCharacters();
 }
+
 function renderShop(){
- const box=document.getElementById("shop");box.innerHTML="";
+ const box=document.getElementById("shop");
+ box.innerHTML="";
  items.forEach(item=>{
-  const card=document.createElement("div");card.className="card";
+  const card=document.createElement("div");
+  card.className="card";
   card.innerHTML=`<div class="portrait">${item.emoji}</div><h3>${item.name}</h3><p>${item.desc}</p>`;
-  const btn=document.createElement("button");btn.className="secondary";
-  btn.textContent=owned(item.id)?"OWNED": "BUY · "+item.price+" LOOT";
+  const btn=document.createElement("button");
+  btn.className="secondary";
+  btn.textContent=owned(item.id)?"OWNED":"BUY · "+item.price+" LOOT";
   btn.disabled=owned(item.id);
   btn.onclick=()=>buyItem(item.id);
-  card.appendChild(btn);box.appendChild(card);
+  card.appendChild(btn);
+  box.appendChild(card);
  });
 }
+
 function buyItem(id){
- const item=items.find(x=>x.id===id);if(!item||owned(id))return;
+ const item=items.find(x=>x.id===id);
+ if(!item||owned(id))return;
  if(state.loot<item.price){alert("Not enough demo loot. Complete another heist first.");return;}
  if(!confirm("Buy "+item.name+" for "+item.price+" demo loot?"))return;
- state.loot-=item.price;state.inventory.push(id);save();renderShop();
+ state.loot-=item.price;
+ state.inventory.push(id);
+ save();
+ renderShop();
  alert("Unlocked: "+item.name+". This is a demo item, not a real purchase.");
 }
+
 function startGame(){
- state.step=0;state.score=0;state.finished=false;
+ state.step=0;
+ state.score=0;
+ state.finished=false;
  document.getElementById("home").style.display="none";
  document.getElementById("game").style.display="block";
  document.getElementById("activeCrew").textContent="Operator: "+character().name;
  document.getElementById("notice").textContent="Your gear affects the odds. Choose your route.";
- renderRoom();window.scrollTo({top:0,behavior:"smooth"});
+ renderRoom();
+ window.scrollTo({top:0,behavior:"smooth"});
 }
+
 function renderRoom(){
  const r=rooms[state.step];
  document.getElementById("roomIcon").textContent=r.icon;
  document.getElementById("roomTitle").textContent=r.title;
  document.getElementById("roomText").textContent=r.text;
  document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
- const box=document.getElementById("choices");box.innerHTML="";
+ const box=document.getElementById("choices");
+ box.innerHTML="";
  r.choices.forEach((c,i)=>{
-  const b=document.createElement("button");b.className="choice";
-  const title=document.createElement("b");title.textContent=c.label;
-  const sub=document.createElement("span");sub.textContent=c.sub;
-  b.append(title,sub);b.onclick=()=>choose(i);box.appendChild(b);
+  const b=document.createElement("button");
+  b.className="choice";
+  const title=document.createElement("b");
+  title.textContent=c.label;
+  const sub=document.createElement("span");
+  sub.textContent=c.sub;
+  b.append(title,sub);
+  b.onclick=()=>choose(i);
+  box.appendChild(b);
  });
 }
+
 function effectiveRisk(c){
  let risk=c.risk;
  if(c.type==="stealth"&&owned("cloak"))risk-=.15;
@@ -237,70 +285,128 @@ function effectiveRisk(c){
  if(character().id==="viper"&&c.type==="hack")risk-=.2;
  return Math.max(.03,risk);
 }
+
 function choose(i){
  if(state.finished)return;
  const c=rooms[state.step].choices[i];
  const success=Math.random()>=effectiveRisk(c);
  let gain=success?c.loot:Math.max(5,Math.floor(c.loot*.2));
  if(success&&character().id==="ace")gain=Math.floor(gain*1.1);
- state.score+=gain;state.loot+=gain;
+ state.score+=gain;
+ state.loot+=gain;
  document.getElementById("notice").textContent=(success?"SUCCESS: ":"ALERT: ")+(success?c.success:c.fail)+" You collected "+gain+" loot.";
  state.step++;
  save();
  if(state.step>=rooms.length){finishGame();return;}
  document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
  document.getElementById("choices").innerHTML="";
- const next=document.createElement("button");next.className="primary";next.textContent="CONTINUE HEIST →";next.onclick=renderRoom;
+ const next=document.createElement("button");
+ next.className="primary";
+ next.textContent="CONTINUE HEIST →";
+ next.onclick=renderRoom;
  document.getElementById("choices").appendChild(next);
 }
+
 function finishGame(){
- state.finished=true;state.missions++;state.best=Math.max(state.best,state.score);save();
+ state.finished=true;
+ state.missions++;
+ state.best=Math.max(state.best,state.score);
+ save();
  document.getElementById("bar").style.width="100%";
  document.getElementById("roomIcon").textContent="🏆";
  document.getElementById("roomTitle").textContent="HEIST COMPLETE";
  document.getElementById("roomText").textContent="You escaped with "+state.score+" loot. Equip new gear or select another operator before your next run.";
  document.getElementById("choices").innerHTML="";
- const b=document.createElement("button");b.className="primary";b.textContent="RUN IT AGAIN";b.onclick=startGame;
+ const b=document.createElement("button");
+ b.className="primary";
+ b.textContent="RUN IT AGAIN";
+ b.onclick=startGame;
  document.getElementById("choices").appendChild(b);
 }
+
 function goHome(){
  document.getElementById("game").style.display="none";
  document.getElementById("home").style.display="block";
- renderCharacters();renderShop();updateUI();window.scrollTo({top:0,behavior:"smooth"});
+ renderCharacters();
+ renderShop();
+ updateUI();
+ window.scrollTo({top:0,behavior:"smooth"});
 }
+
 function showInventory(){
  const names=state.inventory.map(id=>{
-  const item=items.find(x=>x.id===id);if(item)return item.name;
-  const c=characters.find(x=>"crew_"+x.id===id);return c?c.name+" (operator)":"Unknown item";
+  const item=items.find(x=>x.id===id);
+  if(item)return item.name;
+  const c=characters.find(x=>"crew_"+x.id===id);
+  return c?c.name+" (operator)":"Unknown item";
  });
  alert(names.length?"YOUR INVENTORY\n\n"+names.join("\n"):"Your inventory is empty. Complete a heist to earn loot.");
 }
+
 function showStats(){
  alert("VAULT RUSH STATS\n\nCompleted heists: "+state.missions+"\nBest score: "+state.best+"\nDemo loot: "+state.loot+"\nUnlocked items: "+state.inventory.length+"\nSelected operator: "+character().name);
 }
-renderCharacters();renderShop();updateUI();
+
+renderCharacters();
+renderShop();
+updateUI();
 </script>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 (function(){
  const badge=document.getElementById("vr-telegram-player");
- const tg=window.Telegram&&window.Telegram.WebApp;
 
- if(tg){
+ function renderPlayerInfo(){
+  const tg=window.Telegram&&window.Telegram.WebApp;
+
+  if(!tg){
+   badge.textContent="Open this game inside Telegram to identify your account.";
+   return;
+  }
+
   tg.ready();
   tg.expand();
+
   const user=tg.initDataUnsafe&&tg.initDataUnsafe.user;
 
-  if(user){
-   const name=user.first_name||user.username||"Player";
-   badge.textContent="🎮 PLAYER: "+name;
-  }else{
-   badge.textContent="🎮 PLAYER: Guest";
+  badge.replaceChildren();
+
+  function addLine(label,value){
+   const line=document.createElement("div");
+   const labelSpan=document.createElement("span");
+   labelSpan.className="player-label";
+   labelSpan.textContent=label+": ";
+
+   const valueSpan=document.createElement("span");
+   valueSpan.className="player-value";
+   valueSpan.textContent=value;
+
+   line.append(labelSpan,valueSpan);
+   badge.appendChild(line);
   }
- }else{
-  badge.textContent="🎮 PLAYER: Guest";
- }
+
+  const heading=document.createElement("div");
+  heading.textContent="🎮 TELEGRAM PLAYER";
+  badge.appendChild(heading);
+
+  if(!user){
+   addLine("Telegram ID","Unavailable");
+   addLine("Username","Unavailable");
+   addLine("Status","Open through the Telegram bot menu");
+   return;
+  }
+
+  addLine("Telegram ID",String(user.id));
+  addLine("Username",user.username?"@"+user.username:"Not set");
+  addLine("First name",user.first_name||"Not provided");
+})();
+ 
+if(document.readyState==="loading"){
+ document.addEventListener("DOMContentLoaded",renderPlayerInfo);
+}else{
+ renderPlayerInfo();
+}
 })();
 </script>
 </body>
