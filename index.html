@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,7 +36,8 @@ p{color:var(--muted);line-height:1.55}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
 .card.selected{border-color:var(--pink);box-shadow:0 0 15px #ff42a51b}
-.portrait{height:145px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:65px;background:radial-gradient(circle at 50% 25%,#64365f,#24162e 68%,#15101e);margin-bottom:12px}
+.portrait{height:180px;border-radius:11px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:65px;background:radial-gradient(circle at 50% 25%,#64365f,#24162e 68%,#15101e);margin-bottom:12px}
+.portrait img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
 .card h3{font-size:15px;margin:8px 0}
 .card p{font-size:12px;margin:5px 0 12px}
 .card button{width:100%}
@@ -55,7 +57,7 @@ p{color:var(--muted);line-height:1.55}
 .notice{margin-top:12px;background:#21172c;border:1px solid var(--line);padding:13px;border-radius:11px;font-size:13px;line-height:1.5}
 .nav{display:flex;gap:8px;margin-top:24px}.nav button{flex:1}
 footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
-@media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:1fr}.vault-art{min-height:180px}.vault-icon{font-size:65px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.portrait{height:110px;font-size:52px}.choices{grid-template-columns:1fr}.choice{min-height:65px}.stats{gap:5px}.stat{padding:8px}.stat b{font-size:17px}}
+@media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:1fr}.vault-art{min-height:180px}.vault-icon{font-size:65px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.portrait{height:140px;font-size:52px}.choices{grid-template-columns:1fr}.choice{min-height:65px}.stats{gap:5px}.stat{padding:8px}.stat b{font-size:17px}}
 </style>
 </head>
 <body>
@@ -109,15 +111,15 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
 const defaultState={loot:0,step:0,score:0,missions:0,best:0,inventory:[],crew:"nyx"};
 let state;
 try{
- state=Object.assign(defaultState,JSON.parse(localStorage.getItem("vr_save")||"{}"));
+ state=Object.assign({...defaultState},JSON.parse(localStorage.getItem("vr_save")||"{}"));
 }catch(e){state={...defaultState};}
 if(!Array.isArray(state.inventory))state.inventory=[];
 if(!["nyx","viper","ace"].includes(state.crew))state.crew="nyx";
 
 const characters=[
- {id:"nyx",name:"Raven",role:"THE SIREN",emoji:"🖤",style:"Midnight luxury",desc:"A seductive, mysterious infiltrator who moves unseen.",perk:"Stealth routes are 15% safer.",price:0},
- {id:"viper",name:"Vixen",role:"THE HACKER",emoji:"💜",style:"Neon temptress",desc:"A glamorous, sharp-minded hacker who can crack secure doors.",perk:"Hack routes are 20% safer.",price:180},
- {id:"ace",name:"Rogue",role:"THE OPERATOR",emoji:"🕶️",style:"Luxury street king",desc:"A charismatic operator built for high-risk escapes.",perk:"Earn 10% extra loot on successful choices.",price:220}
+ {id:"nyx",name:"Raven",role:"THE SIREN",emoji:"🖤",image:"raven.png",style:"Midnight luxury",desc:"A seductive, mysterious infiltrator who moves unseen.",perk:"Stealth routes are 15% safer.",price:0},
+ {id:"viper",name:"Vixen",role:"THE HACKER",emoji:"💜",image:"vixen.png",style:"Neon temptress",desc:"A glamorous, sharp-minded hacker who can crack secure doors.",perk:"Hack routes are 20% safer.",price:180},
+ {id:"ace",name:"Rogue",role:"THE OPERATOR",emoji:"🕶️",image:"rogue.png",style:"Luxury street king",desc:"A charismatic operator built for high-risk escapes.",perk:"Earn 10% extra loot on successful choices.",price:220}
 ];
 
 const items=[
@@ -163,7 +165,13 @@ function renderCharacters(){
   const unlocked=c.price===0||owned("crew_"+c.id);
   const selected=state.crew===c.id;
   const card=document.createElement("div");card.className="card"+(selected?" selected":"");
-  card.innerHTML=`<div class="portrait">${c.emoji}</div><span class="badge">${c.role}</span><h3>${c.name}</h3><p>${c.desc}</p><p><b>Perk:</b> ${c.perk}</p><div class="small">${c.style}</div>`;
+  card.innerHTML=`<div class="portrait"></div><span class="badge">${c.role}</span><h3>${c.name}</h3><p>${c.desc}</p><p><b>Perk:</b> ${c.perk}</p><div class="small">${c.style}</div>`;
+  const portrait=card.querySelector(".portrait");
+  const img=document.createElement("img");
+  img.src=c.image;
+  img.alt=c.name;
+  img.onerror=()=>{portrait.textContent=c.emoji;};
+  portrait.appendChild(img);
   const btn=document.createElement("button");btn.className=selected?"primary":"secondary";
   btn.textContent=selected?"SELECTED":unlocked?"SELECT":"UNLOCK · "+c.price+" LOOT";
   btn.onclick=()=>selectCharacter(c.id);
