@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,20 +58,18 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  <div><div class="logo">VAULT <span>RUSH</span></div><div class="eyebrow">A Crypto Edge game</div></div>
  <div class="wallet">◈ <span id="loot">0</span> LOOT</div>
 </header>
-
 <div id="vr-telegram-player" class="telegram-player">
  <div>🎮 PLAYER PROFILE</div>
  <div id="profile-display">Connecting to Telegram...</div>
  <div class="profile-status" id="profile-status">Checking account authentication...</div>
 </div>
-
 <main id="home">
  <section class="hero">
   <div class="panel">
    <div class="eyebrow">Your crew. Your rules.</div>
    <h1>STEAL THE<br><span>SPOTLIGHT.</span></h1>
    <p>Build your crew, choose your route, outsmart security and escape with the loot.</p>
-   <button class="primary" onclick="startGame()">▶ START HEIST</button>
+   <button class="primary" id="start-button" onclick="startGame()">▶ START HEIST</button>
    <div class="stats">
     <div class="stat"><span class="eyebrow">HEISTS</span><b id="missionCount">0</b></div>
     <div class="stat"><span class="eyebrow">BEST SCORE</span><b id="best">0</b></div>
@@ -85,7 +84,6 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  <section class="cards" id="shop"></section>
  <p class="small">Prototype only. Loot has no cash value. Shop purchases use demo loot, not real money.</p>
 </main>
-
 <section class="game panel" id="game">
  <div class="game-top"><div><div class="eyebrow">MISSION 01</div><h2 style="margin:5px 0">Midnight Vault</h2><span class="small" id="activeCrew"></span></div><button class="secondary" onclick="goHome()">✕ EXIT</button></div>
  <div class="progress"><div id="bar"></div></div>
@@ -93,7 +91,6 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
  <div class="choices" id="choices"></div>
  <div class="notice" id="notice">Choose your first move.</div>
 </section>
-
 <div class="nav">
  <button class="secondary" onclick="goHome()">⌂ HOME</button>
  <button class="secondary" onclick="showInventory()">▣ INVENTORY</button>
@@ -101,7 +98,6 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
 </div>
 <footer>CRYPTO EDGE · VAULT RUSH · PLAYABLE PROTOTYPE</footer>
 </div>
-
 <div class="profile-overlay" id="profile-overlay">
  <div class="profile-box">
   <div class="eyebrow">WELCOME TO VAULT RUSH</div>
@@ -115,184 +111,46 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
   <div class="profile-status" id="profile-error"></div>
  </div>
 </div>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 const API_BASE="https://vault-rush-api7.farshadberry.workers.dev";
 const defaultState={loot:0,step:0,score:0,missions:0,best:0,inventory:[],crew:"nyx"};
-let state;
-
-try{
- state=Object.assign({...defaultState},JSON.parse(localStorage.getItem("vr_save")||"{}"));
-}catch(e){state={...defaultState};}
-if(!Array.isArray(state.inventory))state.inventory=[];
-if(!["nyx","viper","ace"].includes(state.crew))state.crew="nyx";
+let state={...defaultState};
+let telegramInitData="";
+let playerReady=false;
+let busy=false;
+let sessionId="";
+let activeHeist=null;
 
 const characters=[
  {id:"nyx",name:"Raven",role:"THE SIREN",emoji:"🖤",image:"raven.png",style:"Midnight luxury",desc:"A seductive, mysterious infiltrator who moves unseen.",perk:"Stealth routes are 15% safer.",price:0},
  {id:"viper",name:"Vixen",role:"THE HACKER",emoji:"💜",image:"vixen.png",style:"Neon temptress",desc:"A glamorous, sharp-minded hacker who can crack secure doors.",perk:"Hack routes are 20% safer.",price:180},
  {id:"ace",name:"Rogue",role:"THE OPERATOR",emoji:"🕶️",image:"rogue.png",style:"Luxury street king",desc:"A charismatic operator built for high-risk escapes.",perk:"Earn 10% extra loot on successful choices.",price:220}
 ];
-
 const items=[
- {id:"kit",name:"Hacking Kit",emoji:"💻",price:100,desc:"Reduces the risk of hack choices by 15%.",type:"hack"},
- {id:"cloak",name:"Shadow Cloak",emoji:"🥷",price:120,desc:"Reduces the risk of stealth choices by 15%.",type:"stealth"},
- {id:"scanner",name:"Security Scanner",emoji:"📡",price:160,desc:"Reduces the risk of all choices by 5%.",type:"all"},
- {id:"style",name:"Neon Outfit",emoji:"✨",price:90,desc:"A collectible cosmetic outfit.",type:"cosmetic"}
+ {id:"kit",name:"Hacking Kit",emoji:"💻",price:100,desc:"Reduces the risk of hack choices by 15%."},
+ {id:"cloak",name:"Shadow Cloak",emoji:"🥷",price:120,desc:"Reduces the risk of stealth choices by 15%."},
+ {id:"scanner",name:"Security Scanner",emoji:"📡",price:160,desc:"Reduces the risk of all choices by 5%."},
+ {id:"style",name:"Neon Outfit",emoji:"✨",price:90,desc:"A collectible cosmetic outfit."}
 ];
-
 const rooms=[
  {icon:"🚪",title:"The Entry Point",text:"Three ways inside. Your crew and gear can change the odds.",choices:[
-  {label:"🕶️ Sneak In",sub:"Quiet route · 35 loot",type:"stealth",risk:.28,loot:35,success:"You slip past the guard and find a service corridor.",fail:"A motion sensor catches you. You still make it inside."},
-  {label:"💻 Hack Panel",sub:"Tech route · 45 loot",type:"hack",risk:.24,loot:45,success:"The panel turns green. The door unlocks.",fail:"The security system resists, but you get through."},
-  {label:"🚨 Create Diversion",sub:"Risky route · 55 loot",type:"loud",risk:.4,loot:55,success:"The guards leave their post. You rush inside.",fail:"Extra security arrives. You escape the first room."}
+  {label:"🕶️ Sneak In",sub:"Quiet route · stealth",success:"You slip past the guard and find a service corridor.",fail:"A motion sensor catches you. You still make it inside."},
+  {label:"💻 Hack Panel",sub:"Tech route · hacking",success:"The panel turns green. The door unlocks.",fail:"The security system resists, but you get through."},
+  {label:"🚨 Create Diversion",sub:"Risky route · loud",success:"The guards leave their post. You rush inside.",fail:"Extra security arrives. You escape the first room."}
  ]},
  {icon:"⚡",title:"The Laser Hall",text:"A laser grid blocks your route. Choose carefully.",choices:[
-  {label:"🤸 Slide Through",sub:"Agility · 40 loot",type:"stealth",risk:.3,loot:40,success:"A perfect slide gets you past the lasers.",fail:"A laser catches your equipment. You lose time."},
-  {label:"🔧 Disable Grid",sub:"Technical · 35 loot",type:"hack",risk:.18,loot:35,success:"The grid powers down. The corridor is clear.",fail:"The panel sparks, but the emergency door opens."},
-  {label:"🗺️ Secret Detour",sub:"Safer · 22 loot",type:"safe",risk:.12,loot:22,success:"You find an unguarded side passage.",fail:"The detour is longer than expected."}
+  {label:"🤸 Slide Through",sub:"Agility · stealth",success:"A perfect slide gets you past the lasers.",fail:"A laser catches your equipment. You lose time."},
+  {label:"🔧 Disable Grid",sub:"Technical · hacking",success:"The grid powers down. The corridor is clear.",fail:"The panel sparks, but the emergency door opens."},
+  {label:"🗺️ Secret Detour",sub:"Safer route",success:"You find an unguarded side passage.",fail:"The detour is longer than expected."}
  ]},
  {icon:"🔐",title:"The Main Vault",text:"The prize is right there. Make your final decision.",choices:[
-  {label:"💎 Crack the Lock",sub:"Big reward · 100 loot",type:"hack",risk:.35,loot:100,success:"The vault opens. Gems and gold fill your bag!",fail:"The lock jams. You grab a smaller bundle."},
-  {label:"🧠 Solve Cipher",sub:"Smart play · 75 loot",type:"safe",risk:.2,loot:75,success:"Cipher solved. The vault opens silently.",fail:"Wrong sequence. You salvage a smaller reward."},
-  {label:"🏃 Grab & Run",sub:"Quick escape · 45 loot",type:"stealth",risk:.1,loot:45,success:"You escape with a bundle just before lockdown.",fail:"You escape, but leave the best loot behind."}
+  {label:"💎 Crack the Lock",sub:"High-risk vault entry",success:"The vault opens. Gems and gold fill your bag!",fail:"The lock jams. You salvage what you can."},
+  {label:"🧠 Solve Cipher",sub:"Smart play",success:"Cipher solved. The vault opens silently.",fail:"Wrong sequence. You salvage a smaller reward."},
+  {label:"🏃 Grab & Run",sub:"Quick escape",success:"You escape with a bundle just before lockdown.",fail:"You escape, but leave the best loot behind."}
  ]}
 ];
 
-function save(){
- try{localStorage.setItem("vr_save",JSON.stringify(state));}catch(e){}
- updateUI();
-}
-function owned(id){return state.inventory.includes(id);}
-function character(){return characters.find(c=>c.id===state.crew)||characters[0];}
-
-function updateUI(){
- document.getElementById("loot").textContent=state.loot;
- document.getElementById("missionCount").textContent=state.missions;
- document.getElementById("best").textContent=state.best;
- document.getElementById("crewCount").textContent=characters.filter(c=>c.price===0||owned("crew_"+c.id)).length+"/3";
-}
-
-function renderCharacters(){
- const box=document.getElementById("characters");box.innerHTML="";
- characters.forEach(c=>{
-  const unlocked=c.price===0||owned("crew_"+c.id),selected=state.crew===c.id;
-  const card=document.createElement("div");card.className="card"+(selected?" selected":"");
-  card.innerHTML=`<div class="portrait"></div><span class="badge">${c.role}</span><h3>${c.name}</h3><p>${c.desc}</p><p><b>Perk:</b> ${c.perk}</p><div class="small">${c.style}</div>`;
-  const portrait=card.querySelector(".portrait"),img=document.createElement("img");
-  img.src=c.image;img.alt=c.name;img.onerror=()=>{img.remove();portrait.textContent=c.emoji;};portrait.appendChild(img);
-  const btn=document.createElement("button");btn.className=selected?"primary":"secondary";
-  btn.textContent=selected?"SELECTED":unlocked?"SELECT":"UNLOCK · "+c.price+" LOOT";
-  btn.onclick=()=>selectCharacter(c.id);card.appendChild(btn);box.appendChild(card);
- });
-}
-
-function selectCharacter(id){
- const c=characters.find(x=>x.id===id);if(!c)return;
- if(c.price>0&&!owned("crew_"+id)){
-  if(state.loot<c.price){alert("Not enough demo loot. Complete another heist first.");return;}
-  if(!confirm("Unlock "+c.name+" for "+c.price+" demo loot?"))return;
-  state.loot-=c.price;state.inventory.push("crew_"+id);
- }
- state.crew=id;save();renderCharacters();
-}
-
-function renderShop(){
- const box=document.getElementById("shop");box.innerHTML="";
- items.forEach(item=>{
-  const card=document.createElement("div");card.className="card";
-  card.innerHTML=`<div class="portrait">${item.emoji}</div><h3>${item.name}</h3><p>${item.desc}</p>`;
-  const btn=document.createElement("button");btn.className="secondary";
-  btn.textContent=owned(item.id)?"OWNED":"BUY · "+item.price+" LOOT";btn.disabled=owned(item.id);
-  btn.onclick=()=>buyItem(item.id);card.appendChild(btn);box.appendChild(card);
- });
-}
-
-function buyItem(id){
- const item=items.find(x=>x.id===id);if(!item||owned(id))return;
- if(state.loot<item.price){alert("Not enough demo loot. Complete another heist first.");return;}
- if(!confirm("Buy "+item.name+" for "+item.price+" demo loot?"))return;
- state.loot-=item.price;state.inventory.push(id);save();renderShop();
- alert("Unlocked: "+item.name+". This is a demo item, not a real purchase.");
-}
-
-function startGame(){
- state.step=0;state.score=0;state.finished=false;
- document.getElementById("home").style.display="none";
- document.getElementById("game").style.display="block";
- document.getElementById("activeCrew").textContent="Operator: "+character().name;
- document.getElementById("notice").textContent="Your gear affects the odds. Choose your route.";
- renderRoom();window.scrollTo({top:0,behavior:"smooth"});
-}
-
-function renderRoom(){
- const r=rooms[state.step];
- document.getElementById("roomIcon").textContent=r.icon;
- document.getElementById("roomTitle").textContent=r.title;
- document.getElementById("roomText").textContent=r.text;
- document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
- const box=document.getElementById("choices");box.innerHTML="";
- r.choices.forEach((c,i)=>{
-  const b=document.createElement("button");b.className="choice";
-  const title=document.createElement("b");title.textContent=c.label;
-  const sub=document.createElement("span");sub.textContent=c.sub;
-  b.append(title,sub);b.onclick=()=>choose(i);box.appendChild(b);
- });
-}
-
-function effectiveRisk(c){
- let risk=c.risk;
- if(c.type==="stealth"&&owned("cloak"))risk-=.15;
- if(c.type==="hack"&&owned("kit"))risk-=.15;
- if(owned("scanner"))risk-=.05;
- if(character().id==="nyx"&&c.type==="stealth")risk-=.15;
- if(character().id==="viper"&&c.type==="hack")risk-=.2;
- return Math.max(.03,risk);
-}
-
-function choose(i){
- if(state.finished)return;
- const c=rooms[state.step].choices[i],success=Math.random()>=effectiveRisk(c);
- let gain=success?c.loot:Math.max(5,Math.floor(c.loot*.2));
- if(success&&character().id==="ace")gain=Math.floor(gain*1.1);
- state.score+=gain;state.loot+=gain;
- document.getElementById("notice").textContent=(success?"SUCCESS: ":"ALERT: ")+(success?c.success:c.fail)+" You collected "+gain+" loot.";
- state.step++;save();
- if(state.step>=rooms.length){finishGame();return;}
- document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
- document.getElementById("choices").innerHTML="";
- const next=document.createElement("button");next.className="primary";next.textContent="CONTINUE HEIST →";
- next.onclick=renderRoom;document.getElementById("choices").appendChild(next);
-}
-
-function finishGame(){
- state.finished=true;state.missions++;state.best=Math.max(state.best,state.score);save();
- document.getElementById("bar").style.width="100%";
- document.getElementById("roomIcon").textContent="🏆";
- document.getElementById("roomTitle").textContent="HEIST COMPLETE";
- document.getElementById("roomText").textContent="You escaped with "+state.score+" loot. Equip new gear or select another operator before your next run.";
- document.getElementById("choices").innerHTML="";
- const b=document.createElement("button");b.className="primary";b.textContent="RUN IT AGAIN";b.onclick=startGame;
- document.getElementById("choices").appendChild(b);
-}
-
-function goHome(){
- document.getElementById("game").style.display="none";document.getElementById("home").style.display="block";
- renderCharacters();renderShop();updateUI();window.scrollTo({top:0,behavior:"smooth"});
-}
-
-function showInventory(){
- const names=state.inventory.map(id=>{
-  const item=items.find(x=>x.id===id);if(item)return item.name;
-  const c=characters.find(x=>"crew_"+x.id===id);return c?c.name+" (operator)":"Unknown item";
- });
- alert(names.length?"YOUR INVENTORY\n\n"+names.join("\n"):"Your inventory is empty. Complete a heist to earn loot.");
-}
-function showStats(){
- alert("VAULT RUSH STATS\n\nCompleted heists: "+state.missions+"\nBest score: "+state.best+"\nDemo loot: "+state.loot+"\nUnlocked items: "+state.inventory.length+"\nSelected operator: "+character().name);
-}
-
-/* Telegram account and server-backed player profile */
 const profileDisplay=document.getElementById("profile-display");
 const profileStatus=document.getElementById("profile-status");
 const profileOverlay=document.getElementById("profile-overlay");
@@ -300,9 +158,10 @@ const profileForm=document.getElementById("profile-form");
 const profileInput=document.getElementById("profile-name");
 const profileSubmit=document.getElementById("profile-submit");
 const profileError=document.getElementById("profile-error");
-let telegramInitData="";
-let profileRequestBusy=false;
 
+function playerName(data){
+ return data?.displayName||data?.display_name||data?.player?.displayName||data?.player?.display_name||data?.profile?.displayName||data?.profile?.display_name||"";
+}
 function setProfileDisplay(name){
  profileDisplay.replaceChildren();
  const line=document.createElement("div");
@@ -310,23 +169,203 @@ function setProfileDisplay(name){
  const value=document.createElement("span");value.className="player-value";value.textContent=name;
  line.append(label,value);profileDisplay.appendChild(line);
 }
-
-async function apiRequest(path,method,body){
+async function apiRequest(path,method="GET",body){
  const options={method,headers:{"Content-Type":"application/json"}};
  if(body)options.body=JSON.stringify(body);
  const response=await fetch(API_BASE+path,options);
  let data;
  try{data=await response.json();}catch(e){throw new Error("The server returned an unreadable response.");}
- if(!response.ok)throw new Error(data.error||"Request failed ("+response.status+").");
+ if(!response.ok||data.ok===false)throw new Error(data.error||"Request failed ("+response.status+").");
  return data;
 }
-
 function showProfileModal(){
  profileError.textContent="";
- profileInput.value=localStorage.getItem("vr_profile_name")||"";
+ try{profileInput.value=localStorage.getItem("vr_profile_name")||"";}catch(e){profileInput.value="";}
  profileOverlay.style.display="flex";
 }
-
+function owned(id){return state.inventory.includes(id);}
+function character(){return characters.find(c=>c.id===state.crew)||characters[0];}
+function setBusy(value){
+ busy=value;
+ document.querySelectorAll("button").forEach(b=>{
+  if(b.dataset.keepEnabled!=="true")b.disabled=value;
+ });
+ if(!value)renderCharactersAndShop();
+}
+function updateUI(){
+ document.getElementById("loot").textContent=state.loot;
+ document.getElementById("missionCount").textContent=state.missions;
+ document.getElementById("best").textContent=state.best;
+ document.getElementById("crewCount").textContent=characters.filter(c=>c.price===0||owned(c.id)).length+"/3";
+}
+function renderCharactersAndShop(){
+ renderCharacters();renderShop();updateUI();
+}
+function renderCharacters(){
+ const box=document.getElementById("characters");box.innerHTML="";
+ characters.forEach(c=>{
+  const unlocked=c.price===0||owned(c.id),selected=state.crew===c.id;
+  const card=document.createElement("div");card.className="card"+(selected?" selected":"");
+  card.innerHTML=`<div class="portrait"></div><span class="badge">${c.role}</span><h3>${c.name}</h3><p>${c.desc}</p><p><b>Perk:</b> ${c.perk}</p><div class="small">${c.style}</div>`;
+  const portrait=card.querySelector(".portrait"),img=document.createElement("img");
+  img.src=c.image;img.alt=c.name;img.onerror=()=>{img.remove();portrait.textContent=c.emoji;};portrait.appendChild(img);
+  const btn=document.createElement("button");btn.className=selected?"primary":"secondary";
+  btn.textContent=selected?"SELECTED":unlocked?"SELECT":"UNLOCK · "+c.price+" LOOT";
+  btn.disabled=busy||!playerReady;
+  btn.onclick=()=>selectCharacter(c.id);card.appendChild(btn);box.appendChild(card);
+ });
+}
+function renderShop(){
+ const box=document.getElementById("shop");box.innerHTML="";
+ items.forEach(item=>{
+  const card=document.createElement("div");card.className="card";
+  card.innerHTML=`<div class="portrait">${item.emoji}</div><h3>${item.name}</h3><p>${item.desc}</p>`;
+  const btn=document.createElement("button");btn.className="secondary";
+  btn.textContent=owned(item.id)?"OWNED":"BUY · "+item.price+" LOOT";
+  btn.disabled=busy||!playerReady||owned(item.id);
+  btn.onclick=()=>buyItem(item.id);card.appendChild(btn);box.appendChild(card);
+ });
+}
+async function refreshState(){
+ const result=await apiRequest("/api/state","POST",{initData:telegramInitData});
+ const p=result.player||result.profile;
+ if(!p)throw new Error("The server did not return your player data.");
+ state.loot=Number(p.loot)||0;
+ state.missions=Number(p.missionsCompleted??p.missions_completed)||0;
+ state.best=Number(p.bestScore??p.best_score)||0;
+ state.crew=p.crewId||p.crew_id||"nyx";
+ if(!characters.some(c=>c.id===state.crew))state.crew="nyx";
+ state.inventory=Array.isArray(result.inventory)?result.inventory.map(x=>typeof x==="string"?x:(x.item_id||x.itemId)).filter(Boolean):[];
+ activeHeist=result.activeHeist||null;
+ updateUI();
+ renderCharactersAndShop();
+ return result;
+}
+async function selectCharacter(id){
+ if(busy||!playerReady)return;
+ const c=characters.find(x=>x.id===id);if(!c)return;
+ try{
+  setBusy(true);
+  if(c.price>0&&!owned(c.id)){
+   if(state.loot<c.price)throw new Error("Not enough demo loot. Complete another heist first.");
+   if(!confirm("Unlock "+c.name+" for "+c.price+" demo loot?"))return;
+   await apiRequest("/api/purchase","POST",{initData:telegramInitData,itemId:c.id});
+  }
+  await apiRequest("/api/crew","POST",{initData:telegramInitData,crewId:id});
+  await refreshState();
+  document.getElementById("activeCrew").textContent="Operator: "+character().name;
+ }catch(error){alert(error.message);}
+ finally{setBusy(false);}
+}
+async function buyItem(id){
+ if(busy||!playerReady)return;
+ const item=items.find(x=>x.id===id);if(!item||owned(id))return;
+ if(state.loot<item.price){alert("Not enough demo loot. Complete another heist first.");return;}
+ if(!confirm("Buy "+item.name+" for "+item.price+" demo loot?"))return;
+ try{
+  setBusy(true);
+  await apiRequest("/api/purchase","POST",{initData:telegramInitData,itemId:id});
+  await refreshState();
+  alert("Unlocked: "+item.name+". This is a demo item, not a real purchase.");
+ }catch(error){alert(error.message);}
+ finally{setBusy(false);}
+}
+function showGame(){
+ document.getElementById("home").style.display="none";
+ document.getElementById("game").style.display="block";
+ document.getElementById("activeCrew").textContent="Operator: "+character().name;
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+async function startGame(){
+ if(busy||!playerReady)return;
+ try{
+  setBusy(true);
+  const result=await apiRequest("/api/heist/start","POST",{initData:telegramInitData});
+  sessionId=result.sessionId||result.session_id||"";
+  if(!sessionId)throw new Error("The server did not return a heist session.");
+  state.step=Number(result.step)||0;
+  state.score=Number(result.score)||0;
+  state.finished=Boolean(result.finished);
+  showGame();
+  if(state.finished){showFinished();return;}
+  renderRoom();
+  document.getElementById("notice").textContent=result.resumed?"Resuming your active heist. Choose your next move.":"Your heist has started on the server. Choose your route.";
+ }catch(error){alert(error.message);}
+ finally{setBusy(false);}
+}
+function renderRoom(){
+ if(state.step>=rooms.length){showFinished();return;}
+ const r=rooms[state.step];
+ document.getElementById("roomIcon").textContent=r.icon;
+ document.getElementById("roomTitle").textContent=r.title;
+ document.getElementById("roomText").textContent=r.text;
+ document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
+ const box=document.getElementById("choices");box.innerHTML="";
+ r.choices.forEach((c,i)=>{
+  const b=document.createElement("button");b.className="choice";b.disabled=busy||!playerReady;
+  const title=document.createElement("b");title.textContent=c.label;
+  const sub=document.createElement("span");sub.textContent=c.sub;
+  b.append(title,sub);b.onclick=()=>choose(i);box.appendChild(b);
+ });
+}
+async function choose(i){
+ if(busy||!playerReady||!sessionId||state.step>=rooms.length)return;
+ const room=rooms[state.step],choice=room.choices[i];
+ if(!choice)return;
+ try{
+  setBusy(true);
+  document.getElementById("notice").textContent="Sending your decision to the game server...";
+  const result=await apiRequest("/api/heist/choose","POST",{
+   initData:telegramInitData,sessionId,step:state.step,choiceIndex:i
+  });
+  if(result.sessionId)sessionId=result.sessionId;
+  const success=Boolean(result.success);
+  const gain=Number(result.gain)||0;
+  state.score=Number(result.score)||state.score+gain;
+  state.step=Number(result.step??(state.step+1));
+  document.getElementById("notice").textContent=(success?"SUCCESS: ":"ALERT: ")+(success?choice.success:choice.fail)+" You collected "+gain+" demo loot.";
+  await refreshState();
+  if(result.finished||state.step>=rooms.length){
+   showFinished();
+  }else{
+   document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
+   const box=document.getElementById("choices");box.innerHTML="";
+   const next=document.createElement("button");next.className="primary";next.textContent="CONTINUE HEIST →";
+   next.onclick=renderRoom;box.appendChild(next);
+  }
+ }catch(error){
+  document.getElementById("notice").textContent="The server could not confirm this move: "+error.message;
+  const retry=document.createElement("button");retry.className="secondary";retry.textContent="RETRY THIS MOVE";
+  retry.onclick=()=>choose(i);document.getElementById("choices").replaceChildren(retry);
+ }finally{setBusy(false);}
+}
+function showFinished(){
+ state.finished=true;
+ document.getElementById("bar").style.width="100%";
+ document.getElementById("roomIcon").textContent="🏆";
+ document.getElementById("roomTitle").textContent="HEIST COMPLETE";
+ document.getElementById("roomText").textContent="Your server-confirmed score for this heist: "+state.score+". Equip new gear or select another operator before your next run.";
+ document.getElementById("choices").innerHTML="";
+ const b=document.createElement("button");b.className="primary";b.textContent="RUN IT AGAIN";b.onclick=startGame;
+ document.getElementById("choices").appendChild(b);
+ document.getElementById("notice").textContent="Mission complete. Your loot and stats are saved on the server.";
+}
+function goHome(){
+ document.getElementById("game").style.display="none";
+ document.getElementById("home").style.display="block";
+ renderCharactersAndShop();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function showInventory(){
+ const names=state.inventory.map(id=>{
+  const item=items.find(x=>x.id===id);if(item)return item.name;
+  const c=characters.find(x=>x.id===id);return c?c.name+" (operator)":"Unknown item";
+ });
+ alert(names.length?"YOUR INVENTORY\n\n"+names.join("\n"):"Your inventory is empty. Complete a heist to earn demo loot.");
+}
+function showStats(){
+ alert("VAULT RUSH STATS\n\nCompleted heists: "+state.missions+"\nBest score: "+state.best+"\nDemo loot: "+state.loot+"\nUnlocked items: "+state.inventory.length+"\nSelected operator: "+character().name);
+}
 async function connectPlayer(){
  const tg=window.Telegram&&window.Telegram.WebApp;
  if(!tg){
@@ -341,15 +380,19 @@ async function connectPlayer(){
   profileStatus.textContent="Close the game and reopen it from the Telegram bot menu.";
   return;
  }
-
  profileDisplay.textContent="Authenticating...";
  profileStatus.textContent="Checking your account with the game server...";
  try{
   const result=await apiRequest("/api/me?initData="+encodeURIComponent(telegramInitData),"GET");
-  if(result.profile&&result.profile.display_name){
-   setProfileDisplay(result.profile.display_name);
+  const name=playerName(result);
+  if(name){
+   setProfileDisplay(name);
    profileStatus.textContent="✓ Profile connected to the game server.";
-   try{localStorage.setItem("vr_profile_name",result.profile.display_name);}catch(e){}
+   try{localStorage.setItem("vr_profile_name",name);}catch(e){}
+   await refreshState();
+   playerReady=true;
+   profileStatus.textContent="✓ Profile connected. Game data synced with the server.";
+   renderCharactersAndShop();
   }else{
    profileStatus.textContent="Your account is verified. Choose a player name to finish setup.";
    showProfileModal();
@@ -359,39 +402,37 @@ async function connectPlayer(){
   profileStatus.textContent=error.message+" Check that the Worker is deployed and reopen the game.";
  }
 }
-
 profileForm.addEventListener("submit",async function(event){
  event.preventDefault();
- if(profileRequestBusy)return;
+ if(busy)return;
  const displayName=profileInput.value.trim().replace(/\s+/g," ");
  if(!/^[A-Za-z0-9_ ]{3,16}$/.test(displayName)){
-  profileError.textContent="Use 3–16 letters, numbers, spaces or underscores.";
-  return;
+  profileError.textContent="Use 3–16 letters, numbers, spaces or underscores.";return;
  }
  if(!telegramInitData){
-  profileError.textContent="Telegram authentication is missing. Reopen the game from Telegram.";
-  return;
+  profileError.textContent="Telegram authentication is missing. Reopen the game from Telegram.";return;
  }
- profileRequestBusy=true;profileSubmit.disabled=true;profileSubmit.textContent="SAVING...";
+ busy=true;profileSubmit.disabled=true;profileSubmit.textContent="SAVING...";
  profileError.textContent="Saving your profile securely...";
  try{
   const result=await apiRequest("/api/profile","POST",{initData:telegramInitData,displayName});
-  const savedName=result.player&&result.player.display_name;
-  if(!result.ok||!savedName)throw new Error("The server did not confirm the saved profile.");
+  const savedName=playerName(result)||displayName;
+  if(result.ok===false)throw new Error(result.error||"The server did not confirm the saved profile.");
   try{localStorage.setItem("vr_profile_name",savedName);}catch(e){}
   setProfileDisplay(savedName);
   profileStatus.textContent="✓ Profile saved on the game server.";
   profileOverlay.style.display="none";
+  await refreshState();
+  playerReady=true;
+  profileStatus.textContent="✓ Profile connected. Game data synced with the server.";
+  renderCharactersAndShop();
  }catch(error){
   profileError.textContent=error.message;
  }finally{
-  profileRequestBusy=false;profileSubmit.disabled=false;profileSubmit.textContent="SAVE PLAYER NAME";
+  busy=false;profileSubmit.disabled=false;profileSubmit.textContent="SAVE PLAYER NAME";
  }
 });
-
-renderCharacters();
-renderShop();
-updateUI();
+renderCharactersAndShop();
 connectPlayer();
 </script>
 </body>
