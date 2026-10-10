@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090812">
+<title>Vault Rush | Crypto Edge</title>
+<style>
+:root{--bg:#090812;--panel:#151323;--pink:#ff3fa4;--purple:#9a62ff;--gold:#ffc857;--text:#f8f5ff;--muted:#a7a0bd;--line:#302943}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#251338 0%,var(--bg) 55%);color:var(--text);font-family:Inter,Arial,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer}
+.app{max-width:1050px;margin:auto;padding:20px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:12px 0 20px}
+.logo{font-size:25px;font-weight:1000;font-style:italic;letter-spacing:-1px}
+.logo span{color:var(--pink)}
+.eyebrow{color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+.wallet{border:1px solid #5c3c67;background:#1d1428;border-radius:12px;padding:10px 14px;color:var(--gold);font-weight:800}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:22px}
+.panel{background:linear-gradient(145deg,#1b172a,#100e1a);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 12px 35px #0003}
+h1{font-size:clamp(32px,6vw,58px);line-height:.98;margin:14px 0}
+h1 span{color:var(--pink)}
+p{color:var(--muted);line-height:1.6}
+.primary{background:linear-gradient(100deg,var(--pink),#a55bff);border:0;color:white;border-radius:12px;padding:14px 18px;font-weight:900;width:100%;margin-top:10px}
+.secondary{background:#211a30;border:1px solid #49365e;color:white;border-radius:10px;padding:11px 14px}
+.stats{display:flex;gap:10px;margin-top:18px}
+.stat{flex:1;background:#0d0b16;border:1px solid var(--line);padding:12px;border-radius:12px}
+.stat b{display:block;font-size:20px;margin-top:5px}
+.vault-art{min-height:290px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:radial-gradient(circle,#48234d 0%,#1a1229 40%,#100d19 75%);border-radius:15px;border:1px solid #49305c;overflow:hidden;position:relative}
+.vault-icon{font-size:100px;filter:drop-shadow(0 0 25px #ff3fa466)}
+.vault-art h2{margin:0;color:var(--gold)}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:28px 0 14px}
+.section-title h2{margin:0;font-size:20px}
+.tag{font-size:11px;border-radius:30px;padding:6px 9px;background:#33213d;color:#ff9bd1}
+.missions,.shop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.mission,.item{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px}
+.mission .emoji{font-size:32px}
+.mission h3,.item h3{font-size:15px;margin:12px 0 6px}
+.mission p,.item p{font-size:12px;margin:0 0 12px}
+.mission button,.item button{width:100%}
+.mission.locked{opacity:.5}
+.game{display:none;margin-top:22px}
+.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.progress{height:7px;background:#30263e;border-radius:8px;overflow:hidden;margin:12px 0 20px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width .3s}
+.room{min-height:200px;border:1px solid #4b315b;border-radius:16px;background:radial-gradient(circle at 50% 30%,#48204b,#171024 65%,#0c0a14);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+.room-icon{font-size:64px}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.choice{border:1px solid #49385c;background:#20172c;border-radius:12px;padding:15px 8px;color:white;min-height:90px}
+.choice:hover{border-color:var(--pink);background:#30203b}
+.choice b{display:block;margin-bottom:7px}
+.notice{border-radius:12px;background:#20172d;padding:12px;margin-top:12px;color:#e8d9ff;min-height:44px;font-size:13px}
+.bottom-nav{display:flex;gap:8px;margin-top:24px}
+.bottom-nav button{flex:1}
+footer{text-align:center;color:#736c87;font-size:11px;padding:28px 0}
+@media(max-width:650px){.app{padding:14px}.hero{grid-template-columns:1fr}.missions,.shop{grid-template-columns:1fr}.vault-art{min-height:190px}.vault-icon{font-size:70px}.choices{grid-template-columns:1fr}.choice{min-height:65px}.stats{gap:6px}.stat{padding:9px}.stat b{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <div class="logo">VAULT <span>RUSH</span></div>
+    <div class="eyebrow">A Crypto Edge game</div>
+  </div>
+  <div class="wallet">◈ <span id="loot">0</span> LOOT</div>
+</header>
+
+<main id="home">
+  <section class="hero">
+    <div class="panel">
+      <div class="eyebrow">Your next heist starts here</div>
+      <h1>STEAL THE<br><span>SPOTLIGHT.</span></h1>
+      <p>Choose your route. Outsmart the security. Crack the vault. Every decision counts.</p>
+      <button class="primary" onclick="startGame()">▶ START FREE MISSION</button>
+      <div class="stats">
+        <div class="stat"><span class="eyebrow">MISSIONS</span><b id="missionCount">0 / 3</b></div>
+        <div class="stat"><span class="eyebrow">BEST SCORE</span><b id="best">0</b></div>
+        <div class="stat"><span class="eyebrow">RANK</span><b>ROOKIE</b></div>
+      </div>
+    </div>
+    <div class="vault-art">
+      <div class="vault-icon">🔐</div>
+      <h2>THE MIDNIGHT VAULT</h2>
+      <p>High risk. High style. Your story.</p>
+      <span class="tag">MISSION 01 · AVAILABLE</span>
+    </div>
+  </section>
+
+  <div class="section-title"><h2>Choose Your Mission</h2><span class="tag">MORE MISSIONS SOON</span></div>
+  <section class="missions">
+    <div class="mission">
+      <div class="emoji">🌃</div><h3>Midnight Vault</h3>
+      <p>Find the key and escape with the loot.</p>
+      <button class="secondary" onclick="startGame()">PLAY FREE</button>
+    </div>
+    <div class="mission locked">
+      <div class="emoji">🛰️</div><h3>Neon Data Bank</h3>
+      <p>Hack a secure futuristic archive.</p>
+      <button class="secondary" disabled>COMING SOON</button>
+    </div>
+    <div class="mission locked">
+      <div class="emoji">💎</div><h3>Diamond District</h3>
+      <p>Navigate laser grids and security drones.</p>
+      <button class="secondary" disabled>COMING SOON</button>
+    </div>
+  </section>
+
+  <div class="section-title"><h2>Rogue's Market</h2><span class="tag">DEMO SHOP</span></div>
+  <section class="shop">
+    <div class="item"><div class="emoji">🕶️</div><h3>Shadow Look</h3><p>Exclusive stealth style.</p><button class="secondary" onclick="buyDemo('Shadow Look',100)">100 ◈</button></div>
+    <div class="item"><div class="emoji">🧥</div><h3>Neon Jacket</h3><p>Stand out on every run.</p><button class="secondary" onclick="buyDemo('Neon Jacket',150)">150 ◈</button></div>
+    <div class="item"><div class="emoji">🗡️</div><h3>Phantom Gear</h3><p>A legendary-looking loadout.</p><button class="secondary" onclick="buyDemo('Phantom Gear',250)">250 ◈</button></div>
+  </section>
+  <p style="font-size:11px">Demo only: loot and shop purchases are stored locally in this browser. They have no cash value and are not real purchases.</p>
+</main>
+
+<section class="game panel" id="game">
+  <div class="game-top">
+    <div><div class="eyebrow">MISSION 01</div><h2 style="margin:5px 0">Midnight Vault</h2></div>
+    <button class="secondary" onclick="goHome()">✕ EXIT</button>
+  </div>
+  <div class="progress"><div id="bar"></div></div>
+  <div class="room">
+    <div class="room-icon" id="roomIcon">🚪</div>
+    <h2 id="roomTitle">The Entry Point</h2>
+    <p id="roomText">Security is active. Choose your approach.</p>
+  </div>
+  <div class="choices" id="choices"></div>
+  <div class="notice" id="notice">Pick a route to begin your heist.</div>
+</section>
+
+<div class="bottom-nav">
+  <button class="secondary" onclick="goHome()">⌂ HOME</button>
+  <button class="secondary" onclick="showInventory()">▣ INVENTORY</button>
+  <button class="secondary" onclick="showStats()">★ STATS</button>
+</div>
+<footer>CRYPTO EDGE · VAULT RUSH · EARLY PLAYABLE PROTOTYPE</footer>
+</div>
+
+<script>
+const state={loot:0,step:0,score:0,missions:0,best:0,inventory:[],finished:false};
+const rooms=[
+ {icon:"🚪",title:"The Entry Point",text:"The vault entrance is guarded. How do you get inside?",choices:[
+  {label:"🕶️ Sneak in",sub:"Quiet but risky",risk:0.25,loot:35,success:"You slip past the guard and find a service corridor.",fail:"A motion sensor catches you. You lose time."},
+  {label:"💻 Hack panel",sub:"Technical route",risk:0.2,loot:45,success:"The security panel blinks green. Door unlocked.",fail:"The system locks briefly. You barely escape detection."},
+  {label:"🚨 Create a diversion",sub:"Fast and loud",risk:0.4,loot:55,success:"The guards leave their post. You rush inside.",fail:"The diversion attracts extra security."}
+ ]},
+ {icon:"⚡",title:"The Laser Hall",text:"A grid of lasers blocks the corridor. Pick your move.",choices:[
+  {label:"🤸 Slide through",sub:"Agility test",risk:0.3,loot:40,success:"A clean slide gets you through the grid.",fail:"A laser grazes your gear. You drop some loot."},
+  {label:"🔧 Disable lasers",sub:"Use the toolkit",risk:0.15,loot:30,success:"You cut the power to the grid.",fail:"The panel sparks. You have to find another route."},
+  {label:"🗺️ Find a detour",sub:"Safer, slower",risk:0.1,loot:20,success:"The side passage is clear. You reach the next room.",fail:"The detour takes longer than expected."}
+ ]},
+ {icon:"🔐",title:"The Main Vault",text:"The prize is behind one final lock. Make your last choice.",choices:[
+  {label:"💎 Crack the lock",sub:"Big reward",risk:0.35,loot:100,success:"The vault opens. Gold and gems fill your bag!",fail:"The lock jams, but you salvage a small reward."},
+  {label:"🧠 Solve the cipher",sub:"Smart approach",risk:0.2,loot:75,success:"Cipher solved. The vault opens silently.",fail:"Wrong sequence! You grab what you can and run."},
+  {label:"🏃 Grab & run",sub:"Quick escape",risk:0.1,loot:45,success:"You grab a bundle and escape just in time.",fail:"You escape, but leave the best loot behind."}
+ ]}
+];
+function updateUI(){
+ document.getElementById("loot").textContent=state.loot;
+ document.getElementById("missionCount").textContent=state.missions+" / 3";
+ document.getElementById("best").textContent=state.best;
+}
+function startGame(){
+ state.step=0;state.score=0;state.finished=false;
+ document.getElementById("home").style.display="none";
+ document.getElementById("game").style.display="block";
+ document.getElementById("notice").textContent="Choose carefully. Every route has a risk.";
+ renderRoom();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderRoom(){
+ const r=rooms[state.step];
+ document.getElementById("roomIcon").textContent=r.icon;
+ document.getElementById("roomTitle").textContent=r.title;
+ document.getElementById("roomText").textContent=r.text;
+ document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
+ const box=document.getElementById("choices");box.innerHTML="";
+ r.choices.forEach((c,i)=>{
+  const b=document.createElement("button");b.className="choice";
+  const title=document.createElement("b");title.textContent=c.label;
+  const sub=document.createElement("span");sub.textContent=c.sub;
+  b.append(title,sub);b.onclick=()=>choose(i);box.appendChild(b);
+ });
+}
+function choose(i){
+ if(state.finished)return;
+ const c=rooms[state.step].choices[i];
+ const success=Math.random()>=c.risk;
+ let gain=success?c.loot:Math.floor(c.loot*0.2);
+ state.score+=gain;state.loot+=gain;
+ document.getElementById("notice").textContent=(success?"SUCCESS: ":"ALERT: ")+(success?c.success:c.fail)+"  +"+gain+" LOOT";
+ state.step++;
+ if(state.step>=rooms.length){finishGame();return;}
+ document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
+ document.getElementById("choices").innerHTML="";
+ const next=document.createElement("button");next.className="primary";next.textContent="CONTINUE HEIST →";next.onclick=renderRoom;
+ document.getElementById("choices").appendChild(next);
+ updateUI();
+}
+function finishGame(){
+ state.finished=true;state.missions++;state.best=Math.max(state.best,state.score);
+ document.getElementById("bar").style.width="100%";
+ document.getElementById("roomIcon").textContent="🏆";
+ document.getElementById("roomTitle").textContent="HEIST COMPLETE";
+ document.getElementById("roomText").textContent="You escaped with "+state.score+" loot. Your next run could be even better.";
+ document.getElementById("choices").innerHTML="";
+ const b=document.createElement("button");b.className="primary";b.textContent="RUN IT AGAIN";b.onclick=startGame;
+ document.getElementById("choices").appendChild(b);
+ updateUI();
+}
+function goHome(){
+ document.getElementById("game").style.display="none";
+ document.getElementById("home").style.display="block";
+ updateUI();window.scrollTo({top:0,behavior:"smooth"});
+}
+function buyDemo(name,cost){
+ if(state.loot<cost){alert("Not enough demo loot yet. Play a mission first.");return;}
+ if(state.inventory.includes(name)){alert("Already owned: "+name);return;}
+ state.loot-=cost;state.inventory.push(name);updateUI();
+ alert("Unlocked: "+name+"! This is a local demo item, not a real purchase.");
+}
+function showInventory(){
+ alert(state.inventory.length?"YOUR ITEMS\n\n"+state.inventory.join("\n"):"Your inventory is empty. Earn loot and try the demo shop.");
+}
+function showStats(){
+ alert("VAULT RUSH STATS\n\nCompleted missions: "+state.missions+"\nBest score: "+state.best+"\nDemo loot: "+state.loot+"\nUnlocked items: "+state.inventory.length);
+}
+updateUI();
+</script>
+</body>
+</html>
