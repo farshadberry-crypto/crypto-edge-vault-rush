@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,17 +9,14 @@
 :root{--bg:#0a0812;--panel:#171323;--pink:#ff42a5;--purple:#a16aff;--gold:#ffd16a;--text:#faf6ff;--muted:#aaa1bd;--line:#332843}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(ellipse at top,#31143a,var(--bg) 60%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
-button{font:inherit;cursor:pointer}
-button:disabled{opacity:.4;cursor:not-allowed}
+button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}
 .app{max-width:1050px;margin:auto;padding:18px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0 18px}
 .logo{font-size:25px;font-weight:1000;font-style:italic;letter-spacing:-1px}.logo span{color:var(--pink)}
 .eyebrow{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
 .wallet{background:#21152c;border:1px solid #573660;border-radius:12px;padding:12px;color:var(--gold);font-weight:900}
-h1{font-size:clamp(35px,7vw,62px);line-height:.95;margin:15px 0}
-h1 span{color:var(--pink)}
-h2{font-size:22px;margin:0 0 12px}
-p{color:var(--muted);line-height:1.55}
+h1{font-size:clamp(35px,7vw,62px);line-height:.95;margin:15px 0}h1 span{color:var(--pink)}
+h2{font-size:22px;margin:0 0 12px}p{color:var(--muted);line-height:1.55}
 .panel{background:linear-gradient(145deg,#1c172b,#100e19);border:1px solid var(--line);border-radius:18px;padding:20px}
 .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:20px}
 .primary{background:linear-gradient(100deg,var(--pink),#9259ff);color:white;border:0;border-radius:11px;padding:14px;font-weight:900;width:100%;margin-top:8px}
@@ -28,38 +24,30 @@ p{color:var(--muted);line-height:1.55}
 .vault-art{min-height:265px;border-radius:15px;border:1px solid #53365f;background:radial-gradient(circle,#53204f,#21132f 55%,#100d19);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:15px}
 .vault-icon{font-size:90px;filter:drop-shadow(0 0 22px #ff42a555)}
 .tag{display:inline-block;border-radius:30px;background:#38203d;color:#ff9bd3;font-size:10px;padding:7px 10px}
-.stats{display:flex;gap:8px;margin-top:18px}
-.stat{flex:1;background:#0e0b16;border:1px solid var(--line);padding:10px;border-radius:11px}
-.stat b{display:block;font-size:20px;margin-top:5px}
-.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:26px 0 12px}
-.section-title h2{font-size:19px;margin:0}
+.stats{display:flex;gap:8px;margin-top:18px}.stat{flex:1;background:#0e0b16;border:1px solid var(--line);padding:10px;border-radius:11px}.stat b{display:block;font-size:20px;margin-top:5px}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:26px 0 12px}.section-title h2{font-size:19px;margin:0}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
-.card.selected{border-color:var(--pink);box-shadow:0 0 15px #ff42a51b}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}.card.selected{border-color:var(--pink);box-shadow:0 0 15px #ff42a51b}
 .portrait{height:180px;border-radius:11px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:65px;background:radial-gradient(circle at 50% 25%,#64365f,#24162e 68%,#15101e);margin-bottom:12px}
 .portrait img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
-.card h3{font-size:15px;margin:8px 0}
-.card p{font-size:12px;margin:5px 0 12px}
-.card button{width:100%}
-.small{font-size:11px;color:var(--muted)}
-.badge{color:var(--gold);font-size:10px;letter-spacing:1px}
-.game{display:none;margin-top:20px}
-.game-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.progress{height:7px;background:#30263e;border-radius:9px;overflow:hidden;margin:14px 0}
-.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width .3s}
+.card h3{font-size:15px;margin:8px 0}.card p{font-size:12px;margin:5px 0 12px}.card button{width:100%}
+.small{font-size:11px;color:var(--muted)}.badge{color:var(--gold);font-size:10px;letter-spacing:1px}
+.game{display:none;margin-top:20px}.game-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.progress{height:7px;background:#30263e;border-radius:9px;overflow:hidden;margin:14px 0}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width .3s}
 .room{min-height:195px;border:1px solid #51325e;border-radius:15px;background:radial-gradient(circle at 50% 20%,#4c204e,#1b1228 65%,#100d18);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-.room-icon{font-size:65px}
-.room p{max-width:500px}
+.room-icon{font-size:65px}.room p{max-width:500px}
 .choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .choice{background:#21182e;border:1px solid #4b365e;border-radius:12px;padding:15px 10px;color:white;min-height:100px;text-align:left}
-.choice:hover{border-color:var(--pink)}
-.choice b,.choice span{display:block}.choice b{margin-bottom:8px}.choice span{font-size:12px;color:var(--muted);line-height:1.4}
+.choice:hover{border-color:var(--pink)}.choice b,.choice span{display:block}.choice b{margin-bottom:8px}.choice span{font-size:12px;color:var(--muted);line-height:1.4}
 .notice{margin-top:12px;background:#21172c;border:1px solid var(--line);padding:13px;border-radius:11px;font-size:13px;line-height:1.5}
 .nav{display:flex;gap:8px;margin-top:24px}.nav button{flex:1}
 footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
-.telegram-player{display:block;margin-top:12px;background:#17121f;color:#fff;padding:12px;border:1px solid #9b59b6;border-radius:12px;font-size:12px;font-weight:700;overflow-wrap:anywhere;word-break:break-word;line-height:1.8;width:100%;max-width:100%;white-space:normal}
-.telegram-player .player-label{color:#ff9bd3}
-.telegram-player .player-value{color:#ffd16a}
+.telegram-player{display:block;margin-top:12px;background:#17121f;color:#fff;padding:12px;border:1px solid #9b59b6;border-radius:12px;font-size:12px;font-weight:700;overflow-wrap:anywhere;line-height:1.8;width:100%}
+.player-label{color:#ff9bd3}.player-value{color:#ffd16a}
+.profile-overlay{display:none;position:fixed;inset:0;background:#05030beF;z-index:1000;align-items:center;justify-content:center;padding:20px}
+.profile-box{width:100%;max-width:400px;background:#171323;border:1px solid #70417f;border-radius:18px;padding:24px;box-shadow:0 0 40px #ff42a522}
+.profile-box h2{font-size:25px}.profile-box input{width:100%;padding:14px;background:#0e0b16;border:1px solid #49365e;border-radius:10px;color:white;margin:10px 0}
+.profile-box .hint{font-size:12px}.profile-status{font-size:12px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
 @media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:1fr}.vault-art{min-height:180px}.vault-icon{font-size:65px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.portrait{height:140px;font-size:52px}.choices{grid-template-columns:1fr}.choice{min-height:65px}.stats{gap:5px}.stat{padding:8px}.stat b{font-size:17px}}
 </style>
 </head>
@@ -71,9 +59,9 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
 </header>
 
 <div id="vr-telegram-player" class="telegram-player">
- <div>🎮 TELEGRAM PLAYER</div>
- <div><span class="player-label">Telegram ID: </span><span class="player-value">Loading...</span></div>
- <div><span class="player-label">Username: </span><span class="player-value">Loading...</span></div>
+ <div>🎮 PLAYER PROFILE</div>
+ <div id="profile-display">Connecting to Telegram...</div>
+ <div class="profile-status" id="profile-status">Checking account authentication...</div>
 </div>
 
 <main id="home">
@@ -114,16 +102,29 @@ footer{text-align:center;color:#746c87;font-size:11px;padding:28px 0}
 <footer>CRYPTO EDGE · VAULT RUSH · PLAYABLE PROTOTYPE</footer>
 </div>
 
+<div class="profile-overlay" id="profile-overlay">
+ <div class="profile-box">
+  <div class="eyebrow">WELCOME TO VAULT RUSH</div>
+  <h2>Choose Your Player Name</h2>
+  <p>This name identifies you in the game. Your Telegram username won't be used as your public player name.</p>
+  <form id="profile-form">
+   <input id="profile-name" type="text" minlength="3" maxlength="16" autocomplete="nickname" placeholder="Example: ShadowFox" required>
+   <div class="hint">3–16 characters. Letters, numbers, spaces and underscores only.</div>
+   <button class="primary" id="profile-submit" type="submit">SAVE PLAYER NAME</button>
+  </form>
+  <div class="profile-status" id="profile-error"></div>
+ </div>
+</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
+const API_BASE="https://vault-rush-api7.farshadberry.workers.dev";
 const defaultState={loot:0,step:0,score:0,missions:0,best:0,inventory:[],crew:"nyx"};
 let state;
 
 try{
  state=Object.assign({...defaultState},JSON.parse(localStorage.getItem("vr_save")||"{}"));
-}catch(e){
- state={...defaultState};
-}
-
+}catch(e){state={...defaultState};}
 if(!Array.isArray(state.inventory))state.inventory=[];
 if(!["nyx","viper","ace"].includes(state.crew))state.crew="nyx";
 
@@ -162,7 +163,6 @@ function save(){
  try{localStorage.setItem("vr_save",JSON.stringify(state));}catch(e){}
  updateUI();
 }
-
 function owned(id){return state.inventory.includes(id);}
 function character(){return characters.find(c=>c.id===state.crew)||characters[0];}
 
@@ -174,85 +174,55 @@ function updateUI(){
 }
 
 function renderCharacters(){
- const box=document.getElementById("characters");
- box.innerHTML="";
+ const box=document.getElementById("characters");box.innerHTML="";
  characters.forEach(c=>{
-  const unlocked=c.price===0||owned("crew_"+c.id);
-  const selected=state.crew===c.id;
-  const card=document.createElement("div");
-  card.className="card"+(selected?" selected":"");
+  const unlocked=c.price===0||owned("crew_"+c.id),selected=state.crew===c.id;
+  const card=document.createElement("div");card.className="card"+(selected?" selected":"");
   card.innerHTML=`<div class="portrait"></div><span class="badge">${c.role}</span><h3>${c.name}</h3><p>${c.desc}</p><p><b>Perk:</b> ${c.perk}</p><div class="small">${c.style}</div>`;
-  const portrait=card.querySelector(".portrait");
-  const img=document.createElement("img");
-  img.src=c.image;
-  img.alt=c.name;
-  img.onerror=()=>{
-   img.remove();
-   portrait.textContent=c.emoji;
-  };
-  portrait.appendChild(img);
-  const btn=document.createElement("button");
-  btn.className=selected?"primary":"secondary";
+  const portrait=card.querySelector(".portrait"),img=document.createElement("img");
+  img.src=c.image;img.alt=c.name;img.onerror=()=>{img.remove();portrait.textContent=c.emoji;};portrait.appendChild(img);
+  const btn=document.createElement("button");btn.className=selected?"primary":"secondary";
   btn.textContent=selected?"SELECTED":unlocked?"SELECT":"UNLOCK · "+c.price+" LOOT";
-  btn.onclick=()=>selectCharacter(c.id);
-  card.appendChild(btn);
-  box.appendChild(card);
+  btn.onclick=()=>selectCharacter(c.id);card.appendChild(btn);box.appendChild(card);
  });
 }
 
 function selectCharacter(id){
- const c=characters.find(x=>x.id===id);
- if(!c)return;
+ const c=characters.find(x=>x.id===id);if(!c)return;
  if(c.price>0&&!owned("crew_"+id)){
   if(state.loot<c.price){alert("Not enough demo loot. Complete another heist first.");return;}
   if(!confirm("Unlock "+c.name+" for "+c.price+" demo loot?"))return;
-  state.loot-=c.price;
-  state.inventory.push("crew_"+id);
+  state.loot-=c.price;state.inventory.push("crew_"+id);
  }
- state.crew=id;
- save();
- renderCharacters();
+ state.crew=id;save();renderCharacters();
 }
 
 function renderShop(){
- const box=document.getElementById("shop");
- box.innerHTML="";
+ const box=document.getElementById("shop");box.innerHTML="";
  items.forEach(item=>{
-  const card=document.createElement("div");
-  card.className="card";
+  const card=document.createElement("div");card.className="card";
   card.innerHTML=`<div class="portrait">${item.emoji}</div><h3>${item.name}</h3><p>${item.desc}</p>`;
-  const btn=document.createElement("button");
-  btn.className="secondary";
-  btn.textContent=owned(item.id)?"OWNED":"BUY · "+item.price+" LOOT";
-  btn.disabled=owned(item.id);
-  btn.onclick=()=>buyItem(item.id);
-  card.appendChild(btn);
-  box.appendChild(card);
+  const btn=document.createElement("button");btn.className="secondary";
+  btn.textContent=owned(item.id)?"OWNED":"BUY · "+item.price+" LOOT";btn.disabled=owned(item.id);
+  btn.onclick=()=>buyItem(item.id);card.appendChild(btn);box.appendChild(card);
  });
 }
 
 function buyItem(id){
- const item=items.find(x=>x.id===id);
- if(!item||owned(id))return;
+ const item=items.find(x=>x.id===id);if(!item||owned(id))return;
  if(state.loot<item.price){alert("Not enough demo loot. Complete another heist first.");return;}
  if(!confirm("Buy "+item.name+" for "+item.price+" demo loot?"))return;
- state.loot-=item.price;
- state.inventory.push(id);
- save();
- renderShop();
+ state.loot-=item.price;state.inventory.push(id);save();renderShop();
  alert("Unlocked: "+item.name+". This is a demo item, not a real purchase.");
 }
 
 function startGame(){
- state.step=0;
- state.score=0;
- state.finished=false;
+ state.step=0;state.score=0;state.finished=false;
  document.getElementById("home").style.display="none";
  document.getElementById("game").style.display="block";
  document.getElementById("activeCrew").textContent="Operator: "+character().name;
  document.getElementById("notice").textContent="Your gear affects the odds. Choose your route.";
- renderRoom();
- window.scrollTo({top:0,behavior:"smooth"});
+ renderRoom();window.scrollTo({top:0,behavior:"smooth"});
 }
 
 function renderRoom(){
@@ -261,18 +231,12 @@ function renderRoom(){
  document.getElementById("roomTitle").textContent=r.title;
  document.getElementById("roomText").textContent=r.text;
  document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
- const box=document.getElementById("choices");
- box.innerHTML="";
+ const box=document.getElementById("choices");box.innerHTML="";
  r.choices.forEach((c,i)=>{
-  const b=document.createElement("button");
-  b.className="choice";
-  const title=document.createElement("b");
-  title.textContent=c.label;
-  const sub=document.createElement("span");
-  sub.textContent=c.sub;
-  b.append(title,sub);
-  b.onclick=()=>choose(i);
-  box.appendChild(b);
+  const b=document.createElement("button");b.className="choice";
+  const title=document.createElement("b");title.textContent=c.label;
+  const sub=document.createElement("span");sub.textContent=c.sub;
+  b.append(title,sub);b.onclick=()=>choose(i);box.appendChild(b);
  });
 }
 
@@ -288,126 +252,147 @@ function effectiveRisk(c){
 
 function choose(i){
  if(state.finished)return;
- const c=rooms[state.step].choices[i];
- const success=Math.random()>=effectiveRisk(c);
+ const c=rooms[state.step].choices[i],success=Math.random()>=effectiveRisk(c);
  let gain=success?c.loot:Math.max(5,Math.floor(c.loot*.2));
  if(success&&character().id==="ace")gain=Math.floor(gain*1.1);
- state.score+=gain;
- state.loot+=gain;
+ state.score+=gain;state.loot+=gain;
  document.getElementById("notice").textContent=(success?"SUCCESS: ":"ALERT: ")+(success?c.success:c.fail)+" You collected "+gain+" loot.";
- state.step++;
- save();
+ state.step++;save();
  if(state.step>=rooms.length){finishGame();return;}
  document.getElementById("bar").style.width=(state.step/rooms.length*100)+"%";
  document.getElementById("choices").innerHTML="";
- const next=document.createElement("button");
- next.className="primary";
- next.textContent="CONTINUE HEIST →";
- next.onclick=renderRoom;
- document.getElementById("choices").appendChild(next);
+ const next=document.createElement("button");next.className="primary";next.textContent="CONTINUE HEIST →";
+ next.onclick=renderRoom;document.getElementById("choices").appendChild(next);
 }
 
 function finishGame(){
- state.finished=true;
- state.missions++;
- state.best=Math.max(state.best,state.score);
- save();
+ state.finished=true;state.missions++;state.best=Math.max(state.best,state.score);save();
  document.getElementById("bar").style.width="100%";
  document.getElementById("roomIcon").textContent="🏆";
  document.getElementById("roomTitle").textContent="HEIST COMPLETE";
  document.getElementById("roomText").textContent="You escaped with "+state.score+" loot. Equip new gear or select another operator before your next run.";
  document.getElementById("choices").innerHTML="";
- const b=document.createElement("button");
- b.className="primary";
- b.textContent="RUN IT AGAIN";
- b.onclick=startGame;
+ const b=document.createElement("button");b.className="primary";b.textContent="RUN IT AGAIN";b.onclick=startGame;
  document.getElementById("choices").appendChild(b);
 }
 
 function goHome(){
- document.getElementById("game").style.display="none";
- document.getElementById("home").style.display="block";
- renderCharacters();
- renderShop();
- updateUI();
- window.scrollTo({top:0,behavior:"smooth"});
+ document.getElementById("game").style.display="none";document.getElementById("home").style.display="block";
+ renderCharacters();renderShop();updateUI();window.scrollTo({top:0,behavior:"smooth"});
 }
 
 function showInventory(){
  const names=state.inventory.map(id=>{
-  const item=items.find(x=>x.id===id);
-  if(item)return item.name;
-  const c=characters.find(x=>"crew_"+x.id===id);
-  return c?c.name+" (operator)":"Unknown item";
+  const item=items.find(x=>x.id===id);if(item)return item.name;
+  const c=characters.find(x=>"crew_"+x.id===id);return c?c.name+" (operator)":"Unknown item";
  });
  alert(names.length?"YOUR INVENTORY\n\n"+names.join("\n"):"Your inventory is empty. Complete a heist to earn loot.");
 }
-
 function showStats(){
  alert("VAULT RUSH STATS\n\nCompleted heists: "+state.missions+"\nBest score: "+state.best+"\nDemo loot: "+state.loot+"\nUnlocked items: "+state.inventory.length+"\nSelected operator: "+character().name);
 }
 
+/* Telegram account and server-backed player profile */
+const profileDisplay=document.getElementById("profile-display");
+const profileStatus=document.getElementById("profile-status");
+const profileOverlay=document.getElementById("profile-overlay");
+const profileForm=document.getElementById("profile-form");
+const profileInput=document.getElementById("profile-name");
+const profileSubmit=document.getElementById("profile-submit");
+const profileError=document.getElementById("profile-error");
+let telegramInitData="";
+let profileRequestBusy=false;
+
+function setProfileDisplay(name){
+ profileDisplay.replaceChildren();
+ const line=document.createElement("div");
+ const label=document.createElement("span");label.className="player-label";label.textContent="Player name: ";
+ const value=document.createElement("span");value.className="player-value";value.textContent=name;
+ line.append(label,value);profileDisplay.appendChild(line);
+}
+
+async function apiRequest(path,method,body){
+ const options={method,headers:{"Content-Type":"application/json"}};
+ if(body)options.body=JSON.stringify(body);
+ const response=await fetch(API_BASE+path,options);
+ let data;
+ try{data=await response.json();}catch(e){throw new Error("The server returned an unreadable response.");}
+ if(!response.ok)throw new Error(data.error||"Request failed ("+response.status+").");
+ return data;
+}
+
+function showProfileModal(){
+ profileError.textContent="";
+ profileInput.value=localStorage.getItem("vr_profile_name")||"";
+ profileOverlay.style.display="flex";
+}
+
+async function connectPlayer(){
+ const tg=window.Telegram&&window.Telegram.WebApp;
+ if(!tg){
+  profileDisplay.textContent="Not connected";
+  profileStatus.textContent="Open the game from its Telegram bot menu to connect your player profile.";
+  return;
+ }
+ tg.ready();tg.expand();
+ telegramInitData=tg.initData||"";
+ if(!telegramInitData){
+  profileDisplay.textContent="Telegram authentication unavailable";
+  profileStatus.textContent="Close the game and reopen it from the Telegram bot menu.";
+  return;
+ }
+
+ profileDisplay.textContent="Authenticating...";
+ profileStatus.textContent="Checking your account with the game server...";
+ try{
+  const result=await apiRequest("/api/me?initData="+encodeURIComponent(telegramInitData),"GET");
+  if(result.profile&&result.profile.display_name){
+   setProfileDisplay(result.profile.display_name);
+   profileStatus.textContent="✓ Profile connected to the game server.";
+   try{localStorage.setItem("vr_profile_name",result.profile.display_name);}catch(e){}
+  }else{
+   profileStatus.textContent="Your account is verified. Choose a player name to finish setup.";
+   showProfileModal();
+  }
+ }catch(error){
+  profileDisplay.textContent="Connection failed";
+  profileStatus.textContent=error.message+" Check that the Worker is deployed and reopen the game.";
+ }
+}
+
+profileForm.addEventListener("submit",async function(event){
+ event.preventDefault();
+ if(profileRequestBusy)return;
+ const displayName=profileInput.value.trim().replace(/\s+/g," ");
+ if(!/^[A-Za-z0-9_ ]{3,16}$/.test(displayName)){
+  profileError.textContent="Use 3–16 letters, numbers, spaces or underscores.";
+  return;
+ }
+ if(!telegramInitData){
+  profileError.textContent="Telegram authentication is missing. Reopen the game from Telegram.";
+  return;
+ }
+ profileRequestBusy=true;profileSubmit.disabled=true;profileSubmit.textContent="SAVING...";
+ profileError.textContent="Saving your profile securely...";
+ try{
+  const result=await apiRequest("/api/profile","POST",{initData:telegramInitData,displayName});
+  const savedName=result.player&&result.player.display_name;
+  if(!result.ok||!savedName)throw new Error("The server did not confirm the saved profile.");
+  try{localStorage.setItem("vr_profile_name",savedName);}catch(e){}
+  setProfileDisplay(savedName);
+  profileStatus.textContent="✓ Profile saved on the game server.";
+  profileOverlay.style.display="none";
+ }catch(error){
+  profileError.textContent=error.message;
+ }finally{
+  profileRequestBusy=false;profileSubmit.disabled=false;profileSubmit.textContent="SAVE PLAYER NAME";
+ }
+});
+
 renderCharacters();
 renderShop();
 updateUI();
-</script>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-(function(){
- const badge=document.getElementById("vr-telegram-player");
-
- function renderPlayerInfo(){
-  const tg=window.Telegram&&window.Telegram.WebApp;
-
-  if(!tg){
-   badge.textContent="Open this game inside Telegram to identify your account.";
-   return;
-  }
-
-  tg.ready();
-  tg.expand();
-
-  const user=tg.initDataUnsafe&&tg.initDataUnsafe.user;
-
-  badge.replaceChildren();
-
-  function addLine(label,value){
-   const line=document.createElement("div");
-   const labelSpan=document.createElement("span");
-   labelSpan.className="player-label";
-   labelSpan.textContent=label+": ";
-
-   const valueSpan=document.createElement("span");
-   valueSpan.className="player-value";
-   valueSpan.textContent=value;
-
-   line.append(labelSpan,valueSpan);
-   badge.appendChild(line);
-  }
-
-  const heading=document.createElement("div");
-  heading.textContent="🎮 TELEGRAM PLAYER";
-  badge.appendChild(heading);
-
-  if(!user){
-   addLine("Telegram ID","Unavailable");
-   addLine("Username","Unavailable");
-   addLine("Status","Open through the Telegram bot menu");
-   return;
-  }
-
-  addLine("Telegram ID",String(user.id));
-  addLine("Username",user.username?"@"+user.username:"Not set");
-  addLine("First name",user.first_name||"Not provided");
-})();
- 
-if(document.readyState==="loading"){
- document.addEventListener("DOMContentLoaded",renderPlayerInfo);
-}else{
- renderPlayerInfo();
-}
-})();
+connectPlayer();
 </script>
 </body>
 </html>
